@@ -78,12 +78,22 @@ public class CallQueue extends CallQueueExtension implements SystemAuditable {
 
         String name = getName();
         if (StringUtils.isNotBlank(name)) {
-            actions.add(createAction(SET, "effective_caller_id_name=" + String.format(QUEUE_NAME, name)));
+            actions.add(createAction(SET, "origination_caller_id_name=" + String.format(QUEUE_NAME, name)));
         }
 
         String breakAwayDigit = (String) getSettingTypedValue("call-queue/breakaway-digit");
         if (StringUtils.isNotBlank(breakAwayDigit)) {
             actions.add(createAction(SET, "cc_exit_keys=" + breakAwayDigit));
+        }
+
+        Integer baseScore = (Integer) getSettingTypedValue("call-queue/base-score");
+        if (baseScore > 0) {
+            actions.add(createAction(SET, "cc_base_score=" + baseScore));
+        }
+
+        String announceAudio = (String) getSettingTypedValue("call-queue/announce-audio");
+        if (null != announceAudio) {
+            actions.add(createAction(SET, "cc_outbound_announce=" + m_promptsDirectory + DELIM + announceAudio));
         }
 
         boolean answered = false;
@@ -186,7 +196,7 @@ public class CallQueue extends CallQueueExtension implements SystemAuditable {
 
     @Override
     public void setSettings(Setting settings) {
-        settings.acceptVisitor(new AudioDirectorySetter(m_promptsDirectory, "welcome-audio", "goodbye-audio"));
+        settings.acceptVisitor(new AudioDirectorySetter(m_promptsDirectory, "welcome-audio", "announce-audio", "goodbye-audio"));
         settings.acceptVisitor(new AudioDirectorySetter(m_mohDirectory, "moh-sound"));
         super.setSettings(settings);
     }
