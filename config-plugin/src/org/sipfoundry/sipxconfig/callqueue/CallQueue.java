@@ -31,6 +31,7 @@ import org.sipfoundry.sipxconfig.systemaudit.SystemAuditable;
 
 public class CallQueue extends CallQueueExtension implements SystemAuditable {
     private static final String SET = "set";
+    private static final String LIMIT = "limit";
     private static final String RECORD_DIR = "call-queue/record-calls-directory";
     private static final String PLAYBACK = "playback";
     private static final String QUEUE_NAME = "${lua(~stream:write(&quot;(%s) - &quot; .. " +
@@ -79,6 +80,14 @@ public class CallQueue extends CallQueueExtension implements SystemAuditable {
         String name = getName();
         if (StringUtils.isNotBlank(name)) {
             actions.add(createAction(SET, "origination_caller_id_name=" + String.format(QUEUE_NAME, name)));
+        }
+
+        /* limit <backend> <realm> <resource> <max[/interval]> [<transfer_destination_number> [<dialplan> [<context>]] */
+        Integer maxCalls = (Integer) getSettingTypedValue("call-queue/max-calls");
+        if (maxCalls > 0) {
+            actions.add(createAction(LIMIT, String.format("hash callQueue queue-%s %d !USER_BUSY", extension, maxCalls)));
+        }else {
+            actions.add(createAction(LIMIT, String.format("hash callQueue queue-%s", extension)));
         }
 
         String breakAwayDigit = (String) getSettingTypedValue("call-queue/breakaway-digit");

@@ -43,8 +43,9 @@
     <file variable="yes"/>
 </type>
     <group name="call-queue">
+        <setting name="max-calls"><type><integer min="-1"/></type><value>-1</value></setting>
         <setting name="strategy"><type refid="type_strategy"/><value>ring-all</value></setting>
-        <setting name="base-score"><type><integer/></type><value>0</value></setting>
+        <setting name="base-score"><type><integer min="0"/></type><value>0</value></setting>
         <setting name="welcome-audio"><type refid="type_upload-music"/></setting>
         <setting name="announce-audio"><type refid="type_upload-music"/></setting>
         <setting name="goodbye-audio"><type refid="type_upload-music"/></setting>
