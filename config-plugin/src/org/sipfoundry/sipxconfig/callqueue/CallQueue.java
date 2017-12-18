@@ -79,7 +79,7 @@ public class CallQueue extends CallQueueExtension implements SystemAuditable {
 
         String name = getName();
         if (StringUtils.isNotBlank(name)) {
-            actions.add(createAction(SET, "origination_caller_id_name=" + String.format(QUEUE_NAME, name)));
+            actions.add(createAction(SET, "effective_caller_id_name=" + String.format(QUEUE_NAME, name)));
         }
 
         /* limit <backend> <realm> <resource> <max[/interval]> [<transfer_destination_number> [<dialplan> [<context>]] */
