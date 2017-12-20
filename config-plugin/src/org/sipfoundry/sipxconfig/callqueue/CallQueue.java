@@ -32,6 +32,7 @@ import org.sipfoundry.sipxconfig.systemaudit.SystemAuditable;
 
 public class CallQueue extends CallQueueExtension implements SystemAuditable {
     private static final String SET = "set";
+    private static final String LIMIT = "limit";
     private static final String RECORD_DIR = "call-queue/record-calls-directory";
     private static final String PLAYBACK = "playback";
     private static final String QUEUE_NAME = "${lua(~stream:write(&quot;(%s) - &quot; .. " +
@@ -82,9 +83,27 @@ public class CallQueue extends CallQueueExtension implements SystemAuditable {
             actions.add(createAction(SET, "effective_caller_id_name=" + String.format(QUEUE_NAME, name)));
         }
 
+        /* limit <backend> <realm> <resource> <max[/interval]> [<transfer_destination_number> [<dialplan> [<context>]] */
+        Integer maxCalls = (Integer) getSettingTypedValue("call-queue/max-calls");
+        if (maxCalls > 0) {
+            actions.add(createAction(LIMIT, String.format("hash callQueue queue-%s %d !USER_BUSY", extension, maxCalls)));
+        }else {
+            actions.add(createAction(LIMIT, String.format("hash callQueue queue-%s", extension)));
+        }
+
         String breakAwayDigit = (String) getSettingTypedValue("call-queue/breakaway-digit");
         if (StringUtils.isNotBlank(breakAwayDigit)) {
             actions.add(createAction(SET, "cc_exit_keys=" + breakAwayDigit));
+        }
+
+        Integer baseScore = (Integer) getSettingTypedValue("call-queue/base-score");
+        if (baseScore > 0) {
+            actions.add(createAction(SET, "cc_base_score=" + baseScore));
+        }
+
+        String announceAudio = (String) getSettingTypedValue("call-queue/announce-audio");
+        if (null != announceAudio) {
+            actions.add(createAction(SET, "cc_outbound_announce=" + m_promptsDirectory + DELIM + announceAudio));
         }
 
         boolean answered = false;
@@ -190,7 +209,7 @@ public class CallQueue extends CallQueueExtension implements SystemAuditable {
 
     @Override
     public void setSettings(Setting settings) {
-        settings.acceptVisitor(new AudioDirectorySetter(m_promptsDirectory, "welcome-audio", "goodbye-audio"));
+        settings.acceptVisitor(new AudioDirectorySetter(m_promptsDirectory, "welcome-audio", "announce-audio", "goodbye-audio"));
         settings.acceptVisitor(new AudioDirectorySetter(m_mohDirectory, "moh-sound"));
         super.setSettings(settings);
     }
