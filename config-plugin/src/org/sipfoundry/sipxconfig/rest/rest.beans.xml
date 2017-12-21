@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  - See springframework documentation for proper syntax.
+  -   http://static.springsource.org/spring/docs/3.0.x/spring-framework-reference/html/beans.html
+  -->
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
+  <bean id="callQueuesResource" class="org.sipfoundry.sipxconfig.rest.CallQueuesResource" scope="prototype">
+    <property name="callQueueContext" ref="callQueueContext" />
+  </bean>
+  <alias name="callQueuesResource" alias="/callqueue/queues" />
+
+  <!--<bean id="callQueueResource" class="org.sipfoundry.sipxconfig.rest.CallQueueResource" scope="prototype">
+    <property name="callQueueContext" ref="callQueueContext" />
+  </bean>
+  <alias name="callQueueResource" alias="/callqueue/queues/{queue}" />-->
+
+  <bean id="callQueueAgentsResource" class="org.sipfoundry.sipxconfig.rest.CallQueueAgentsResource" scope="prototype">
+    <property name="callQueueContext" ref="callQueueContext" />
+  </bean>
+  <alias name="callQueueAgentsResource" alias="/callqueue/agents" />
+
+  <bean id="callQueueAgentResource" class="org.sipfoundry.sipxconfig.rest.CallQueueAgentResource" scope="prototype">
+    <property name="callQueueContext" ref="callQueueContext" />
+  </bean>
+  <alias name="callQueueAgentResource" alias="/callqueue/agents/{agent}" />
+</beans>
